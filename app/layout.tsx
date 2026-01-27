@@ -6,11 +6,12 @@ import Footer from '@/components/Footer/Footer'
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider'
 
 const roboto = Roboto({
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto',
+  subsets: ['latin'], 
+  weight: ['400', '700'],
+  variable: '--font-roboto', 
+  display: 'swap', 
 })
+
 
 export const metadata: Metadata = {
   title: 'NoteHub',
@@ -35,8 +36,8 @@ export default function RootLayout({
   modal: React.ReactNode
 }) {
   return (
-    <html lang="en" className={roboto.variable}>
-      <body>
+    <html lang="en">
+  <body className={roboto.variable}>
         <TanStackProvider>
           <Header />
           <main>
