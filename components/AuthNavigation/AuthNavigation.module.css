@@ -22,7 +22,6 @@
 
 .navigationItem {
   display: flex;
-  align-items: center;
 }
 
 .navigationLink {

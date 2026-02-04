@@ -2,55 +2,65 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { register } from '@/lib/api/clientApi';
-import css from './SignUp.module.css';
+import { register, RegisterRequest } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
+import css from './SignUpPage.module.css';
 
-export default function SignUpPage() {
+export default function SignUp() {
   const router = useRouter();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const setUser = useAuthStore((state) => state.setUser);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
+  const handleSubmit = async (formData: FormData) => {
     try {
-      await register({ email, password });
-      router.replace('/profile');
-    } catch (err) {
-      setError('Registration failed');
+      const formValues = Object.fromEntries(formData) as RegisterRequest;
+      const res = await register(formValues);
+      if (res) {
+        setUser(res);
+        router.push('/profile');
+      } else {
+        setError('Invalid email or password');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Oops... some error');
+      }
     }
   };
 
   return (
     <main className={css.mainContent}>
-      <form className={css.form} onSubmit={handleSubmit}>
-        <h1 className={css.formTitle}>Sign up</h1>
-
+      <h1 className={css.formTitle}>Sign up</h1>
+      <form className={css.form} action={handleSubmit}>
         <div className={css.formGroup}>
-          <label>Email</label>
+          <label htmlFor='email'>Email</label>
           <input
-            type="email"
+            id='email'
+            type='email'
+            name='email'
+            className={css.input}
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         <div className={css.formGroup}>
-          <label>Password</label>
+          <label htmlFor='password'>Password</label>
           <input
-            type="password"
+            id='password'
+            type='password'
+            name='password'
+            className={css.input}
             required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
-        <button type="submit">Register</button>
+        <div className={css.actions}>
+          <button type='submit' className={css.submitButton}>
+            Register
+          </button>
+        </div>
 
         {error && <p className={css.error}>{error}</p>}
       </form>

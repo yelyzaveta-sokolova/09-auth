@@ -3,22 +3,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
-
-import css from './NotePreview.module.css';
-
 import { fetchNoteById } from '@/lib/api/clientApi';
+import css from './NoteDetails.module.css';
 
-import Modal from '@/components/Modal/Modal';
-
-type ErrorProps = {
-  error: Error;
-};
-
-const NotePreviewClient = () => {
-  const { id } = useParams<{ id: string }>();
+export default function NoteDetailsClient() {
   const router = useRouter();
-  const handleClose = () => router.back();
+  const handleClose = () => router.push('/notes/filter/all');
 
+  const { id } = useParams<{ id: string }>();
   const {
     data: note,
     isLoading,
@@ -29,17 +21,20 @@ const NotePreviewClient = () => {
     refetchOnMount: false,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (error instanceof Error || !note) {
+  if (isLoading) {
+    return <p>Loading, please wait...</p>;
+  }
+
+  if (error || !note) {
     return <p>Something went wrong.</p>;
   }
 
   const formattedDate = note.updatedAt
     ? `Updated at: ${new Date(note.updatedAt).toLocaleDateString('uk-UA')}`
-    : `Created at: ${new Date(note.createdAt).toLocaleDateString('uk-UA')}}`;
+    : `Created at: ${new Date(note.createdAt).toLocaleDateString('uk-UA')}`;
 
   return (
-    <Modal closeModal={handleClose}>
+    <main className={css.main}>
       <div className={css.container}>
         <div className={css.item}>
           <div className={css.header}>
@@ -53,8 +48,6 @@ const NotePreviewClient = () => {
           Back
         </button>
       </div>
-    </Modal>
+    </main>
   );
-};
-
-export default NotePreviewClient;
+}

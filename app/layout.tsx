@@ -1,55 +1,61 @@
-import type { Metadata } from 'next'
-import { Roboto } from 'next/font/google'
 
-import Header from '@/components/Header/Header'
-import Footer from '@/components/Footer/Footer'
-import AuthProvider from '@/components/AuthProvider/AuthProvider'
-import TanStackProvider from '@/components/TanStackProvider/TanStackProvider'
+import { Metadata } from 'next';
+
+import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
+
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
+
+import './globals.css';
+
+import { Roboto } from 'next/font/google';
 
 const roboto = Roboto({
-  subsets: ['latin'], 
+  subsets: ['latin'],
   weight: ['400', '700'],
-  variable: '--font-roboto', 
-  display: 'swap', 
-})
-
+  variable: '--font-roboto',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'NoteHub',
-  description: 'NoteHub — зручний застосунок для створення та керування нотатками',
+  description: 'A simple notes application built with Next.js',
   openGraph: {
     title: 'NoteHub',
-    description: 'NoteHub — зручний застосунок для створення та керування нотатками',
-    url: 'https://your-vercel-url.vercel.app',
+    description: 'A simple notes application built with Next.js',
+    url: 'https://08-zustand-drab-kappa.vercel.app',
     images: [
       {
         url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'NoteHub — a simple web-based note-taking application built with Next.js',
       },
     ],
+    type: 'website',
   },
-}
+};
 
 export default function RootLayout({
   children,
   modal,
 }: {
-  children: React.ReactNode
-  modal: React.ReactNode
+  children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-  <body className={roboto.variable}>
+    <html lang='en'>
+      <body className={roboto.variable}>
         <TanStackProvider>
           <AuthProvider>
-          <Header />
-          <main>
+            <Header />
             {children}
             {modal}
-          </main>
-          <Footer />
-         </AuthProvider>
+            <Footer />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>
-  )
+  );
 }
