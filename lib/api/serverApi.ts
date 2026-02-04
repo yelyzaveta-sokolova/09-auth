@@ -1,30 +1,44 @@
 import { cookies } from 'next/headers';
 import axios from 'axios';
-import { User } from '@/types/user';
-import { Note } from '@/types/note';
+import type { User } from '@/types/user';
+import type { Note } from '@/types/note';
 
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL + '/api';
+const baseURL = 'https://notehub-api.goit.study/api';
 
 const serverApi = axios.create({
   baseURL,
 });
 
-const getCookieHeader = () => ({
-  Cookie: cookies().toString(),
-});
+const getCookieHeader = (): { Cookie: string } => {
+  const cookieStore = cookies(); 
 
-export const checkSession = async () => {
-  const res = await serverApi.get<User | null>('/auth/session', {
-    headers: getCookieHeader(),
-  });
-  return res.data;
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join('; ');
+
+  return {
+    Cookie: cookieHeader,
+  };
 };
 
-export const getMe = async () => {
+export const checkSession = async (): Promise<User | null> => {
+  try {
+    const res = await serverApi.get<User | null>('/auth/session', {
+      headers: getCookieHeader(),
+    });
+
+    return res.data ?? null;
+  } catch {
+    return null;
+  }
+};
+
+export const getMe = async (): Promise<User> => {
   const res = await serverApi.get<User>('/users/me', {
     headers: getCookieHeader(),
   });
+
   return res.data;
 };
 
@@ -32,20 +46,22 @@ export const fetchNotes = async (params?: {
   search?: string;
   page?: number;
   tag?: string;
-}) => {
+}): Promise<Note[]> => {
   const res = await serverApi.get<Note[]>('/notes', {
     headers: getCookieHeader(),
     params: {
-      ...params,
       perPage: 12,
+      ...params,
     },
   });
+
   return res.data;
 };
 
-export const fetchNoteById = async (id: string) => {
+export const fetchNoteById = async (id: string): Promise<Note> => {
   const res = await serverApi.get<Note>(`/notes/${id}`, {
     headers: getCookieHeader(),
   });
+
   return res.data;
 };

@@ -2,12 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 import { login } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
+
 import css from './SignIn.module.css';
 
 export default function SignInPage() {
   const router = useRouter();
   const [error, setError] = useState('');
+
+  const setUser = useAuthStore((state) => state.setUser);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,9 +23,11 @@ export default function SignInPage() {
     const password = formData.get('password') as string;
 
     try {
-      await login({ email, password });
-      router.replace('/profile');
-    } catch {
+      const user = await login({ email, password });
+
+      setUser(user);              // ✅ ВАЖНО
+      router.replace('/profile'); // ✅ РЕДИРЕКТ
+    } catch (err) {
       setError('Invalid email or password');
     }
   };
@@ -32,12 +39,24 @@ export default function SignInPage() {
 
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
-          <input id="email" type="email" name="email" required />
+          <input
+            id="email"
+            type="email"
+            name="email"
+            className={css.input}
+            required
+          />
         </div>
 
         <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
-          <input id="password" type="password" name="password" required />
+          <input
+            id="password"
+            type="password"
+            name="password"
+            className={css.input}
+            required
+          />
         </div>
 
         <div className={css.actions}>

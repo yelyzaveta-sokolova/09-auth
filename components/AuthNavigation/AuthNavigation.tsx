@@ -2,18 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { logout } from '@/lib/api/clientApi';
-import { useAuthStore } from '@/lib/store/authStore';
+
 import css from './AuthNavigation.module.css';
+import { useAuthStore } from '@/lib/store/authStore';
+import { logout } from '@/lib/api/clientApi';
 
 export default function AuthNavigation() {
   const router = useRouter();
   const { isAuthenticated, user, clearIsAuthenticated } = useAuthStore();
 
   const handleLogout = async () => {
-    await logout();
-    clearIsAuthenticated();
-    router.replace('/sign-in');
+    try {
+      await logout();
+    } finally {
+      clearIsAuthenticated();
+      router.replace('/sign-in');
+    }
   };
 
   return (
@@ -21,18 +25,18 @@ export default function AuthNavigation() {
       {isAuthenticated ? (
         <>
           <li className={css.navigationItem}>
-            <Link
-              href="/profile"
-              prefetch={false}
-              className={css.navigationLink}
-            >
+            <Link href="/profile" className={css.navigationLink}>
               Profile
             </Link>
           </li>
 
           <li className={css.navigationItem}>
             <p className={css.userEmail}>{user?.email}</p>
-            <button className={css.logoutButton} onClick={handleLogout}>
+            <button
+              type="button"
+              className={css.logoutButton}
+              onClick={handleLogout}
+            >
               Logout
             </button>
           </li>
@@ -40,21 +44,13 @@ export default function AuthNavigation() {
       ) : (
         <>
           <li className={css.navigationItem}>
-            <Link
-              href="/sign-in"
-              prefetch={false}
-              className={css.navigationLink}
-            >
+            <Link href="/sign-in" className={css.navigationLink}>
               Login
             </Link>
           </li>
 
           <li className={css.navigationItem}>
-            <Link
-              href="/sign-up"
-              prefetch={false}
-              className={css.navigationLink}
-            >
+            <Link href="/sign-up" className={css.navigationLink}>
               Sign up
             </Link>
           </li>

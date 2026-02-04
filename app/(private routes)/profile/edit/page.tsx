@@ -3,31 +3,47 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+
 import { getMe, updateMe } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
+import type { User } from '@/types/user';
+
 import css from './EditProfile.module.css';
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const { setUser } = useAuthStore();
+
+  const [user, setLocalUser] = useState<User | null>(null);
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const loadUser = async () => {
-      const user = await getMe();
-      setUsername(user.username);
-      setEmail(user.email);
-      setAvatar(user.avatar);
+    const fetchUser = async () => {
+      const me = await getMe();
+      setLocalUser(me);
+      setUsername(me.username);
     };
 
-    loadUser();
+    fetchUser();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await updateMe({ username });
-    router.replace('/profile');
+    setIsSaving(true);
+
+    try {
+      const updatedUser = await updateMe({ username });
+      setUser(updatedUser);
+      router.replace('/profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (!user) {
+    return <p style={{ textAlign: 'center' }}>Loading...</p>;
+  }
 
   return (
     <main className={css.mainContent}>
@@ -35,7 +51,7 @@ export default function EditProfilePage() {
         <h1 className={css.formTitle}>Edit Profile</h1>
 
         <Image
-          src={avatar}
+          src={user.avatar}
           alt="User Avatar"
           width={120}
           height={120}
@@ -48,22 +64,28 @@ export default function EditProfilePage() {
             <input
               id="username"
               type="text"
+              className={css.input}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={css.input}
+              required
             />
           </div>
 
-          <p>Email: {email}</p>
+          <p>Email: {user.email}</p>
 
           <div className={css.actions}>
-            <button type="submit" className={css.saveButton}>
+            <button
+              type="submit"
+              className={css.saveButton}
+              disabled={isSaving}
+            >
               Save
             </button>
+
             <button
               type="button"
               className={css.cancelButton}
-              onClick={() => router.push('/profile')}
+              onClick={() => router.back()}
             >
               Cancel
             </button>

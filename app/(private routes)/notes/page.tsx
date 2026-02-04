@@ -10,16 +10,20 @@ import NoteItem from '@/components/NoteItem/NoteItem';
 import css from './Notes.module.css';
 
 export default function NotesPage() {
-  const { data: notes, isLoading, isError } = useQuery<Note[]>({
+  const {
+    data: notes,
+    isLoading,
+    isError,
+  } = useQuery<Note[]>({
     queryKey: ['notes'],
-    queryFn: fetchNotes,
+    queryFn: () => fetchNotes(), // 👈 важно
   });
 
   if (isLoading) {
     return <p>Loading...</p>;
   }
 
-  if (isError) {
+  if (isError || !notes) {
     return <p>Error loading notes</p>;
   }
 
@@ -30,7 +34,7 @@ export default function NotesPage() {
       </Link>
 
       <ul className={css.list}>
-        {notes?.map((note) => (
+        {notes.map((note) => (
           <NoteItem key={note.id} note={note} />
         ))}
       </ul>
