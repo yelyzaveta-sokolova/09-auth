@@ -7,7 +7,6 @@ import { fetchNotes } from '@/lib/api/clientApi';
 import type { Note } from '@/types/note';
 import NoteItem from '@/components/NoteItem/NoteItem';
 
-import css from './Notes.module.css';
 
 export default function NotesPage() {
   const {
@@ -16,7 +15,7 @@ export default function NotesPage() {
     isError,
   } = useQuery<Note[]>({
     queryKey: ['notes'],
-    queryFn: () => fetchNotes(), // 👈 важно
+    queryFn: () => fetchNotes(), 
   });
 
   if (isLoading) {
@@ -28,12 +27,12 @@ export default function NotesPage() {
   }
 
   return (
-    <main className={css.mainContent}>
-      <Link href="/notes/new" className={css.createLink}>
+    <main >
+      <Link href="/notes/new" >
         Create note
       </Link>
 
-      <ul className={css.list}>
+      <ul >
         {notes.map((note) => (
           <NoteItem key={note.id} note={note} />
         ))}

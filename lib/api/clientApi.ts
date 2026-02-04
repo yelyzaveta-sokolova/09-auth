@@ -14,6 +14,71 @@ export const register = async (data: {
 
   return res.data;
 };
+export const createNote = async (data: {
+  title: string;
+  content: string;
+  tag: string;
+}): Promise<Note> => {
+  const res = await fetch('/api/notes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error('Create note failed');
+  }
+
+  return res.json();
+};
+ export const deleteNote = async (id: string): Promise<Note> => {
+  const res = await fetch(`/api/notes/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error('Delete note failed');
+  }
+
+  return res.json();
+};
+export const fetchNoteById = async (id: string): Promise<Note> => {
+  const res = await fetch(`/api/notes/${id}`);
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch note');
+  }
+
+  return res.json();
+};
+
+export const getMe = async (): Promise<User> => {
+  const res = await fetch('/api/users/me');
+
+  if (!res.ok) {
+    throw new Error('Unauthorized');
+  }
+
+  return res.json();
+};
+
+export const updateMe = async (data: {
+  username: string;
+}): Promise<User> => {
+  const res = await fetch('/api/users/me', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error('Update failed');
+  }
+
+  return res.json();
+};
 
 export const login = async (data: {
   email: string;
