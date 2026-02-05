@@ -23,10 +23,11 @@ export type User = {
   updatedAt: Date;
 };
 
-export const register = async (data: RegisterRequest) => {
-  const res = await nextServer.post<User>('/auth/register', data);
+export const register = async (data: RegisterRequest): Promise<User> => {
+  const res = await api.post<User>('/auth/register', data);
   return res.data;
 };
+
 
 
 export interface NotesResponse {

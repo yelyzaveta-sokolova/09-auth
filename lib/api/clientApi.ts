@@ -1,4 +1,3 @@
-
 import { nextServer } from '@/lib/api/api';
 
 import type { User } from '@/types/user';
@@ -40,20 +39,17 @@ export async function fetchNotes({
 }
 
 export async function fetchNoteById(id: string): Promise<Note> {
-  const response = await nextServer.get<Note>(`/notes/${id}`, {});
-
+  const response = await nextServer.get<Note>(`/notes/${id}`);
   return response.data;
 }
 
 export async function createNote(payload: CreateNoteParams): Promise<Note> {
-  const response = await nextServer.post<Note>('/notes', payload, {});
-
+  const response = await nextServer.post<Note>('/notes', payload);
   return response.data;
 }
 
 export async function deleteNote(id: string): Promise<Note> {
-  const response = await nextServer.delete<Note>(`/notes/${id}`, {});
-
+  const response = await nextServer.delete<Note>(`/notes/${id}`);
   return response.data;
 }
 
@@ -77,10 +73,6 @@ export const login = async (data: LoginRequest) => {
   return res.data;
 };
 
-type CheckSessionRequest = {
-  success: boolean;
-};
-
 export const checkSession = async (): Promise<User | null> => {
   try {
     const { data } = await nextServer.get<User>('/auth/session');
@@ -90,7 +82,7 @@ export const checkSession = async (): Promise<User | null> => {
   }
 };
 
-export const getMe = async () => {
+export const getMe = async (): Promise<User> => {
   const { data } = await nextServer.get<User>('/users/me');
   return data;
 };
@@ -99,11 +91,20 @@ export const logout = async (): Promise<void> => {
   await nextServer.post('/auth/logout');
 };
 
+
 export type UpdateMeProps = {
   username?: string;
 };
 
-export const updateMe = async (payload: UpdateMeProps): Promise<User> => {
-  const { data } = await nextServer.patch<User>('/users/me', payload);
+export const updateMe = async (
+  payload: UpdateMeProps | FormData
+): Promise<User> => {
+  const { data } = await nextServer.patch<User>('/users/me', payload, {
+    headers:
+      payload instanceof FormData
+        ? { 'Content-Type': 'multipart/form-data' }
+        : undefined,
+  });
+
   return data;
 };
